@@ -4,7 +4,6 @@ import Grid from "@material-ui/core/Grid";
 // components
 import PageTitle from "../../components/PageTitle";
 import CycleTime from "../../components/Graphs/CycleTime";
-import Throughput from "../../components/Graphs/Throughput";
 import ActivityHeatmap from "../../components/Graphs/ActivityHeatmap";
 import Loading from "../../components/Loading";
 import GraphFilter, {
@@ -232,10 +231,6 @@ export default function BetaReport({ secondarySelect, ...props }) {
           <Grid item lg={12} xs={12}>
             <CycleTime data={cFilteredData} />
           </Grid>
-
-          {/* <Grid item lg={12} xs={12}>
-            <Throughput data={tFilteredData} />
-          </Grid> */}
 
           <Grid item lg={12} xs={12}>
             <ActivityHeatmap

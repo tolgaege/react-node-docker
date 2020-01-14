@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import useTheme from "@material-ui/styles/useTheme";
 import Grid from "@material-ui/core/Grid";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
-import Input from "@material-ui/core/Input";
 import ApexCharts from "react-apexcharts";
 import { Typography, Button } from "../Wrappers/Wrappers";
 import Widget from "../Widget";
