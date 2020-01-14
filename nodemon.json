@@ -1,0 +1,12 @@
+{
+  "exec": "npm run server",
+  "ext": "ts json",
+  "watch": ["./dist/server.js", "src/**/*"],
+  "ignore": [
+    ".git",
+    "logs",
+    "node_modules",
+    "frontend",
+    "dist"
+  ]
+}

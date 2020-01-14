@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  width: 960px;
+  height: 500px;
+  position: relative;
+}
+
+svg {
+    width: 100%;
+    height: 100%;
+}
+
+path.slice{
+    stroke-width:2px;
+}
+
+polyline{
+    opacity: .3;
+    stroke: black;
+    stroke-width: 2px;
+    fill: none;
+}
+
+</style>
+<body>
+
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script>
+
+// Get Individual files
+/*
+
+git ls-tree -r -z --name-only HEAD -- $1 | xargs -0 -n1 git blame --line-porcelain HEAD |grep -A10 "^author " | awk '/^author |^filename /' | awk '{line=line " " $0} NR%2==0{print substr(line,2); line=""}' | sort| uniq -c
+
+*/
+
+// Get Repository Level
+/*
+
+git ls-tree -r -z --name-only HEAD -- $1 | xargs -0 -n1 git blame \
+ --line-porcelain HEAD |grep  "^author "|sort|uniq -c|sort -nr
+
+*/
+
+var data = [
+  "   1 author Andrew Breckenridge filename README.md ",
+  "   8 author Ben filename README.md",
+  "   3 author Ben filename Randoms.swift",
+  " 287 author Ben filename SwiftRandom.xcodeproj/project.pbxproj",
+  "   7 author Ben filename SwiftRandom.xcodeproj/project.xcworkspace/contents.xcworkspacedata",
+  "  87 author Ben filename SwiftRandom.xcodeproj/xcshareddata/xcschemes/SwiftRandom-iOS.xcscheme",
+  "  26 author Ben filename SwiftRandom/Info.plist",
+  "  14 author Ben filename SwiftRandom/SwiftRandom.h",
+  "  11 author Charles Joseph filename SwiftRandom.xcodeproj/project.pbxproj",
+  "  19 author Charles Joseph filename SwiftRandom/Randoms.swift",
+  "  10 author Charles Joseph filename SwiftRandomTests/SwiftRandomTests.swift",
+  "   6 author Claire Knight filename README.md",
+  "  28 author Dani Rangelov filename SwiftRandom/Randoms.swift",
+  "   2 author Demir B filename README.md",
+  "   1 author Ethan Jackwitz filename SwiftRandom.xcodeproj/project.pbxproj",
+  "   1 author Felipe Augusto Sviaghin Ferri filename README.md",
+  "   8 author Felipe Augusto Sviaghin Ferri filename SwiftRandom/Randoms.swift",
+  "  44 author Felipe Augusto Sviaghin Ferri filename SwiftRandomTests/SwiftRandomTests.swift",
+  "   1 author Furkan Yilmaz filename .swift-version",
+  "  22 author Furkan Yilmaz filename LICENSE",
+  " 109 author Furkan Yilmaz filename README.md",
+  "   7 author Furkan Yilmaz filename Randoms.swift",
+  "   3 author Furkan Yilmaz filename SwiftRandom.podspec",
+  "  15 author Goktug Yilmaz filename README.md",
+  "  11 author Goktug Yilmaz filename Randoms.swift",
+  "   1 author Goktug Yilmaz filename SwiftRandom/Randoms.swift",
+  "   5 author Kan Yilmaz filename README.md",
+  "   1 author Kelly Innes filename README.md",
+  "   4 author Luqman Fauzi filename README.md",
+  "   1 author Rafael da Silva Ferreira filename .gitignore",
+  "   2 author Rafael da Silva Ferreira filename Randoms.swift",
+  " 124 author Rafael da Silva Ferreira filename SwiftRandom.xcodeproj/project.pbxproj",
+  "  15 author Rafael da Silva Ferreira filename SwiftRandom.xcodeproj/xcshareddata/xcschemes/SwiftRandom-iOS.xcscheme",
+  " 155 author Rafael da Silva Ferreira filename SwiftRandom/Randoms.swift",
+  "  22 author Rafael da Silva Ferreira filename SwiftRandomTests/Info.plist",
+  " 123 author Rafael da Silva Ferreira filename SwiftRandomTests/SwiftRandomTests.swift",
+  "   2 author ReadmeCritic filename README.md",
+  "   2 author Sabatino Masala filename SwiftRandom.xcodeproj/project.pbxproj",
+  "   1 author Sabatino Masala filename SwiftRandom.xcodeproj/xcshareddata/xcschemes/SwiftRandom-iOS.xcscheme",
+  "   8 author Tealium User filename README.md",
+  "   7 author Tealium User filename SwiftRandom/Randoms.swift",
+  "   2 author Tealium User filename SwiftRandomTests/SwiftRandomTests.swift",
+  "   7 author Yen-Chia Lin filename README.md",
+  "   3 author Yen-Chia Lin filename Randoms.swift",
+  "  18 author jaderfeijo filename README.md",
+  "  54 author jaderfeijo filename SwiftRandom/Randoms.swift",
+  "  63 author jaderfeijo filename SwiftRandomTests/SwiftRandomTests.swift",
+  "  10 author nonn filename Randoms.swift",
+  "  17 author thellimist filename README.md",
+  "   3 author thellimist filename Randoms.swift",
+  "  14 author thellimist filename SwiftRandom.podspec"
+]
+
+// // Somehow it didn't work here
+// data = data.split('\n')
+//     .map(a => a.trim().split('filename ').join(';').split('author ').join(';').split(';'))
+
+// // Some other mapping function
+// Object.values(data.reduce((a, { count,name,file }) => {
+//     file = file.trim()
+//     name = name.trim()
+//     if (!a[file]) a[file] = {file, data: {}}
+//     if (name in a[file]["data"]) a[file]["data"][name] += count
+//     else a[file]["data"][name] = count
+//     return a;
+//   }, {}))
+
+data = [
+  {
+    "count": "1 ",
+    "name": "Andrew Breckenridge ",
+    "file": "README.md"
+  },
+  {
+    "count": "8 ",
+    "name": "Ben ",
+    "file": "README.md"
+  },
+  {
+    "count": "3 ",
+    "name": "Ben ",
+    "file": "Randoms.swift"
+  },
+  {
+    "count": "287 ",
+    "name": "Ben ",
+    "file": "SwiftRandom.xcodeproj/project.pbxproj"
+  },
+  {
+    "count": "7 ",
+    "name": "Ben ",
+    "file": "SwiftRandom.xcodeproj/project.xcworkspace/contents.xcworkspacedata"
+  },
+  {
+    "count": "87 ",
+    "name": "Ben ",
+    "file": "SwiftRandom.xcodeproj/xcshareddata/xcschemes/SwiftRandom-iOS.xcscheme"
+  },
+  {
+    "count": "26 ",
+    "name": "Ben ",
+    "file": "SwiftRandom/Info.plist"
+  },
+  {
+    "count": "14 ",
+    "name": "Ben ",
+    "file": "SwiftRandom/SwiftRandom.h"
+  },
+  {
+    "count": "11 ",
+    "name": "Charles Joseph ",
+    "file": "SwiftRandom.xcodeproj/project.pbxproj"
+  },
+  {
+    "count": "19 ",
+    "name": "Charles Joseph ",
+    "file": "SwiftRandom/Randoms.swift"
+  },
+  {
+    "count": "10 ",
+    "name": "Charles Joseph ",
+    "file": "SwiftRandomTests/SwiftRandomTests.swift"
+  },
+  {
+    "count": "6 ",
+    "name": "Claire Knight ",
+    "file": "README.md"
+  },
+  {
+    "count": "28 ",
+    "name": "Dani Rangelov ",
+    "file": "SwiftRandom/Randoms.swift"
+  },
+  {
+    "count": "2 ",
+    "name": "Demir B ",
+    "file": "README.md"
+  },
+  {
+    "count": "1 ",
+    "name": "Ethan Jackwitz ",
+    "file": "SwiftRandom.xcodeproj/project.pbxproj"
+  },
+  {
+    "count": "1 ",
+    "name": "Felipe Augusto Sviaghin Ferri ",
+    "file": "README.md"
+  },
+  {
+    "count": "8 ",
+    "name": "Felipe Augusto Sviaghin Ferri ",
+    "file": "SwiftRandom/Randoms.swift"
+  },
+  {
+    "count": "44 ",
+    "name": "Felipe Augusto Sviaghin Ferri ",
+    "file": "SwiftRandomTests/SwiftRandomTests.swift"
+  },
+  {
+    "count": "1 ",
+    "name": "Furkan Yilmaz ",
+    "file": ".swift-version"
+  },
+  {
+    "count": "22 ",
+    "name": "Furkan Yilmaz ",
+    "file": "LICENSE"
+  },
+  {
+    "count": "109 ",
+    "name": "Furkan Yilmaz ",
+    "file": "README.md"
+  },
+  {
+    "count": "7 ",
+    "name": "Furkan Yilmaz ",
+    "file": "Randoms.swift"
+  },
+  {
+    "count": "3 ",
+    "name": "Furkan Yilmaz ",
+    "file": "SwiftRandom.podspec"
+  },
+  {
+    "count": "15 ",
+    "name": "Goktug Yilmaz ",
+    "file": "README.md"
+  },
+  {
+    "count": "11 ",
+    "name": "Goktug Yilmaz ",
+    "file": "Randoms.swift"
+  },
+  {
+    "count": "1 ",
+    "name": "Goktug Yilmaz ",
+    "file": "SwiftRandom/Randoms.swift"
+  },
+  {
+    "count": "5 ",
+    "name": "Kan Yilmaz ",
+    "file": "README.md"
+  },
+  {
+    "count": "1 ",
+    "name": "Kelly Innes ",
+    "file": "README.md"
+  },
+  {
+    "count": "4 ",
+    "name": "Luqman Fauzi ",
+    "file": "README.md"
+  },
+  {
+    "count": "1 ",
+    "name": "Rafael da Silva Ferreira ",
+    "file": ".gitignore"
+  },
+  {
+    "count": "2 ",
+    "name": "Rafael da Silva Ferreira ",
+    "file": "Randoms.swift"
+  },
+  {
+    "count": "124 ",
+    "name": "Rafael da Silva Ferreira ",
+    "file": "SwiftRandom.xcodeproj/project.pbxproj"
+  },
+  {
+    "count": "15 ",
+    "name": "Rafael da Silva Ferreira ",
+    "file": "SwiftRandom.xcodeproj/xcshareddata/xcschemes/SwiftRandom-iOS.xcscheme"
+  },
+  {
+    "count": "155 ",
+    "name": "Rafael da Silva Ferreira ",
+    "file": "SwiftRandom/Randoms.swift"
+  },
+  {
+    "count": "22 ",
+    "name": "Rafael da Silva Ferreira ",
+    "file": "SwiftRandomTests/Info.plist"
+  },
+  {
+    "count": "123 ",
+    "name": "Rafael da Silva Ferreira ",
+    "file": "SwiftRandomTests/SwiftRandomTests.swift"
+  },
+  {
+    "count": "2 ",
+    "name": "ReadmeCritic ",
+    "file": "README.md"
+  },
+  {
+    "count": "2 ",
+    "name": "Sabatino Masala ",
+    "file": "SwiftRandom.xcodeproj/project.pbxproj"
+  },
+  {
+    "count": "1 ",
+    "name": "Sabatino Masala ",
+    "file": "SwiftRandom.xcodeproj/xcshareddata/xcschemes/SwiftRandom-iOS.xcscheme"
+  },
+  {
+    "count": "8 ",
+    "name": "Tealium User ",
+    "file": "README.md"
+  },
+  {
+    "count": "7 ",
+    "name": "Tealium User ",
+    "file": "SwiftRandom/Randoms.swift"
+  },
+  {
+    "count": "2 ",
+    "name": "Tealium User ",
+    "file": "SwiftRandomTests/SwiftRandomTests.swift"
+  },
+  {
+    "count": "7 ",
+    "name": "Yen-Chia Lin ",
+    "file": "README.md"
+  },
+  {
+    "count": "3 ",
+    "name": "Yen-Chia Lin ",
+    "file": "Randoms.swift"
+  },
+  {
+    "count": "18 ",
+    "name": "jaderfeijo ",
+    "file": "README.md"
+  },
+  {
+    "count": "54 ",
+    "name": "jaderfeijo ",
+    "file": "SwiftRandom/Randoms.swift"
+  },
+  {
+    "count": "63 ",
+    "name": "jaderfeijo ",
+    "file": "SwiftRandomTests/SwiftRandomTests.swift"
+  },
+  {
+    "count": "10 ",
+    "name": "nonn ",
+    "file": "Randoms.swift"
+  },
+  {
+    "count": "17 ",
+    "name": "thellimist ",
+    "file": "README.md"
+  },
+  {
+    "count": "3 ",
+    "name": "thellimist ",
+    "file": "Randoms.swift"
+  },
+  {
+    "count": "14 ",
+    "name": "thellimist ",
+    "file": "SwiftRandom.podspec"
+  }
+]
+
+data = [
+  {
+    "file": "README.md",
+    "data": {
+      "Andrew Breckenridge": "1 ",
+      "Ben": "8 ",
+      "Claire Knight": "6 ",
+      "Demir B": "2 ",
+      "Felipe Augusto Sviaghin Ferri": "1 ",
+      "Furkan Yilmaz": "109 ",
+      "Goktug Yilmaz": "15 ",
+      "Kan Yilmaz": "5 ",
+      "Kelly Innes": "1 ",
+      "Luqman Fauzi": "4 ",
+      "ReadmeCritic": "2 ",
+      "Tealium User": "8 ",
+      "Yen-Chia Lin": "7 ",
+      "jaderfeijo": "18 ",
+      "thellimist": "17 "
+    }
+  },
+  {
+    "file": "Randoms.swift",
+    "data": {
+      "Ben": "3 ",
+      "Furkan Yilmaz": "7 ",
+      "Goktug Yilmaz": "11 ",
+      "Rafael da Silva Ferreira": "2 ",
+      "Yen-Chia Lin": "3 ",
+      "nonn": "10 ",
+      "thellimist": "3 "
+    }
+  },
+  {
+    "file": "SwiftRandom.xcodeproj/project.pbxproj",
+    "data": {
+      "Ben": "287 ",
+      "Charles Joseph": "11 ",
+      "Ethan Jackwitz": "1 ",
+      "Rafael da Silva Ferreira": "124 ",
+      "Sabatino Masala": "2 "
+    }
+  },
+  {
+    "file": "SwiftRandom.xcodeproj/project.xcworkspace/contents.xcworkspacedata",
+    "data": {
+      "Ben": "7 "
+    }
+  },
+  {
+    "file": "SwiftRandom.xcodeproj/xcshareddata/xcschemes/SwiftRandom-iOS.xcscheme",
+    "data": {
+      "Ben": "87 ",
+      "Rafael da Silva Ferreira": "15 ",
+      "Sabatino Masala": "1 "
+    }
+  },
+  {
+    "file": "SwiftRandom/Info.plist",
+    "data": {
+      "Ben": "26 "
+    }
+  },
+  {
+    "file": "SwiftRandom/SwiftRandom.h",
+    "data": {
+      "Ben": "14 "
+    }
+  },
+  {
+    "file": "SwiftRandom/Randoms.swift",
+    "data": {
+      "Charles Joseph": "19 ",
+      "Dani Rangelov": "28 ",
+      "Felipe Augusto Sviaghin Ferri": "8 ",
+      "Goktug Yilmaz": "1 ",
+      "Rafael da Silva Ferreira": "155 ",
+      "Tealium User": "7 ",
+      "jaderfeijo": "54 "
+    }
+  },
+  {
+    "file": "SwiftRandomTests/SwiftRandomTests.swift",
+    "data": {
+      "Charles Joseph": "10 ",
+      "Felipe Augusto Sviaghin Ferri": "44 ",
+      "Rafael da Silva Ferreira": "123 ",
+      "Tealium User": "2 ",
+      "jaderfeijo": "63 "
+    }
+  },
+  {
+    "file": ".swift-version",
+    "data": {
+      "Furkan Yilmaz": "1 "
+    }
+  },
+  {
+    "file": "LICENSE",
+    "data": {
+      "Furkan Yilmaz": "22 "
+    }
+  },
+  {
+    "file": "SwiftRandom.podspec",
+    "data": {
+      "Furkan Yilmaz": "3 ",
+      "thellimist": "14 "
+    }
+  },
+  {
+    "file": ".gitignore",
+    "data": {
+      "Rafael da Silva Ferreira": "1 "
+    }
+  },
+  {
+    "file": "SwiftRandomTests/Info.plist",
+    "data": {
+      "Rafael da Silva Ferreira": "22 "
+    }
+  }
+]
+
+
+ // 442 author Rafael da Silva Ferreira
+ // 432 author Ben
+ // 142 author Furkan Yilmaz
+ // 135 author jaderfeijo
+ //  53 author Felipe Augusto Sviaghin Ferri
+ //  40 author Charles Joseph
+ //  34 author thellimist
+ //  28 author Dani Rangelov
+ //  27 author Goktug Yilmaz
+ //  17 author Tealium User
+ //  10 author nonn
+ //  10 author Yen-Chia Lin
+ //   6 author Claire Knight
+ //   5 author Kan Yilmaz
+ //   4 author Luqman Fauzi
+ //   3 author Sabatino Masala
+ //   2 author ReadmeCritic
+ //   2 author Demir B
+ //   1 author Kelly Innes
+ //   1 author Ethan Jackwitz
+ //   1 author Andrew Breckenridge
+
+ var repoLevel = [
+   {label: 'Rafael da Silva Ferreira', value: 442},
+   {label: 'Ben', value: 432},
+   {label: 'Furkan Yilmaz', value: 142},
+   {label: 'jaderfeijo', value: 135},
+   {label: 'Felipe Augusto Sviaghin Ferri', value: 53},
+   {label: 'Charles Jseph', value: 31},
+   {label: 'thellimist', value: 34},
+   {label: 'Dani Rangelove', value: 28},
+   {label: 'Goktug Yilmaz', value: 27},
+ ]
+
+// function randomData (){
+//     return data.map(function(d){
+//         return { label: d[1] + d[2], value: parseInt(d[0], 10)}
+//     });
+// }
+
+render('SwiftRandom', repoLevel)
+
+var x = 0
+data.map(function(d){
+    // console.log(d.file, {label: Object.keys(d.data), value: Object.values(d.data)})
+    if (!x) {
+    var result = []
+    for(var i in d.data) {
+        result.push([i, d.data[i]]);
+    }
+
+    var inp = result.map(function(d){
+      return { label: d[0], value: parseInt(d[1],10)}
+    })
+
+    render(d.file, inp)
+
+    // x++
+    }
+})
+
+
+function render(title, data) {
+
+    var svg = d3.select("body")
+        .append("svg")
+        .append("g")
+
+    svg.append("g")
+        .attr("class", "slices");
+    svg.append("g")
+        .attr("class", "labels");
+    svg.append("g")
+        .attr("class", "lines");
+
+    var width = 960,
+        height = 450,
+        radius = Math.min(width, height) / 2;
+
+    svg.append("text")
+        .attr("text-anchor", "middle")
+        .style("font-size", "16px")
+        .style("text-decoration", "underline")
+        .text(title);
+
+
+    var pie = d3.layout.pie()
+        .sort(null)
+        .value(function(d) {
+            return d.value;
+        });
+
+    var arc = d3.svg.arc()
+        .outerRadius(radius * 0.8)
+        .innerRadius(radius * 0.4);
+
+    var outerArc = d3.svg.arc()
+        .innerRadius(radius * 0.9)
+        .outerRadius(radius * 0.9);
+
+    svg.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+    var key = function(d){ return d.data.label; };
+
+    var color = d3.scale.category20();
+
+    /* ------- PIE SLICES -------*/
+    var slice = svg.select(".slices").selectAll("path.slice")
+        .data(pie(data), key);
+
+    slice.enter()
+        .insert("path")
+        .style("fill", function(d) { return color(d.data.label); })
+        .attr("class", "slice")
+
+    slice
+        .transition().duration(1000)
+        .attrTween("d", function(d) {
+            this._current = this._current || d;
+            var interpolate = d3.interpolate(this._current, d);
+            this._current = interpolate(0);
+            return function(t) {
+                return arc(interpolate(t));
+            };
+        })
+
+    slice.enter().append("text")                                     //add a label to each slice
+            .attr("transform", function(d) {
+            d.innerRadius = 0;
+            d.outerRadius = radius;
+            return "translate(" + arc.centroid(d) + ")";
+        })
+        .attr("text-anchor", "middle")
+        .text(function(d, i) {
+            return d.data.value; });
+
+
+    slice.exit()
+        .remove();
+
+    /* ------- TEXT LABELS -------*/
+
+
+    var text = svg.select(".labels").selectAll("text")
+        .data(pie(data), key);
+
+    text.enter()
+        .append("text")
+        .attr("dy", ".35em")
+        .text(function(d) {
+            return d.data.label;
+        });
+
+    function midAngle(d){
+        return d.startAngle + (d.endAngle - d.startAngle)/2;
+    }
+
+    text.transition().duration(1000)
+        .attrTween("transform", function(d) {
+            this._current = this._current || d;
+            var interpolate = d3.interpolate(this._current, d);
+            this._current = interpolate(0);
+            return function(t) {
+                var d2 = interpolate(t);
+                var pos = outerArc.centroid(d2);
+                pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+                return "translate("+ pos +")";
+            };
+        })
+        .styleTween("text-anchor", function(d){
+            this._current = this._current || d;
+            var interpolate = d3.interpolate(this._current, d);
+            this._current = interpolate(0);
+            return function(t) {
+                var d2 = interpolate(t);
+                return midAngle(d2) < Math.PI ? "start":"end";
+            };
+        });
+
+    text.exit()
+        .remove();
+
+    /* ------- SLICE TO TEXT POLYLINES -------*/
+
+    var polyline = svg.select(".lines").selectAll("polyline")
+        .data(pie(data), key);
+
+    polyline.enter()
+        .append("polyline");
+
+    polyline.transition().duration(1000)
+        .attrTween("points", function(d){
+            this._current = this._current || d;
+            var interpolate = d3.interpolate(this._current, d);
+            this._current = interpolate(0);
+            return function(t) {
+                var d2 = interpolate(t);
+                var pos = outerArc.centroid(d2);
+                pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+                return [arc.centroid(d2), outerArc.centroid(d2), pos];
+            };
+        });
+
+    polyline.exit()
+        .remove();
+};
+
+</script>
+</body>

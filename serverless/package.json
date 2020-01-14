@@ -1,0 +1,15 @@
+{
+  "name": "aws-node-github-webhook-listener",
+  "version": "1.0.0",
+  "description": "Extend your github repositories with this github webhook listener",
+  "main": "handler.js",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "logs": "serverless logs -f githubWebhookListener -t"
+  },
+  "author": "David Wells",
+  "license": "MIT",
+  "dependencies": {
+    "postgresql-easy": "1.2.5"
+  }
+}

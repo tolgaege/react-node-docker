@@ -1,0 +1,43 @@
+lib-cov
+*.seed
+**/*.log
+**/log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+*.swp
+.serverless
+
+pids
+logs
+results
+tmp
+
+# Coverage reports
+coverage
+
+# API keys and secrets
+.env*
+serverless/serverless.yml
+
+# Dependency directory
+node_modules
+frontend/node_modules
+serverless/node_modules
+
+# Editors
+.idea
+*.iml
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Ignore built ts files
+**/dist/**/*
+**/build/**/*
+
+# ignore yarn.lock
+yarn.lock

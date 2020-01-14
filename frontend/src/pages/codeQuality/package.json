@@ -1,0 +1,6 @@
+{
+  "name": "CodeQuality",
+  "version": "1.0.0",
+  "private": true,
+  "main": "CodeQuality.js"
+}

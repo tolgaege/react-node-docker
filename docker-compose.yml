@@ -1,0 +1,35 @@
+version: '3.5'
+
+services:
+  haystack:
+    container_name: haystack
+    image: haystack
+    restart: always
+    build:
+      context: .
+    env_file: .env
+    ports:
+      - "5000:5000"
+      - "3000:3000"
+    depends_on:
+      - redis
+    networks:
+      - haystack-network
+
+  redis:
+    container_name: redis
+    image: redis:5.0.3-alpine
+    restart: always
+    env_file: .env
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
+    hostname: ${REDIS_HOST}
+    volumes:
+      - ~/.haystack/redis:/data
+    ports:
+      - ${REDIS_PORT}:6379
+    networks:
+      - haystack-network
+
+networks:
+  haystack-network:
+    driver: bridge

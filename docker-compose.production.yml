@@ -1,0 +1,10 @@
+version: '3.5'
+
+services:
+  haystack:
+    volumes:
+      - /etc/letsencrypt/live/usehaystack.io/fullchain.pem:/etc/letsencrypt/live/usehaystack.io/fullchain.pem
+      - /etc/letsencrypt/live/usehaystack.io/privkey.pem:/etc/letsencrypt/live/usehaystack.io/privkey.pem
+    build:
+      context: .
+    command: npm run start:production
