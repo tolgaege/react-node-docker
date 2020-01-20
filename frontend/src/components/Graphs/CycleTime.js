@@ -55,7 +55,7 @@ export default function CycleTime({ data = [], ...props }) {
             upperTitle
             bodyClass={classes.fullHeightBody}
             className={classes.card}
-            tooltipText={`Pull Request Cycle Work Time: Average time from first commit to merging a Pull Request.\n
+            tooltipText={`Pull Request Cycle Work Second Time: Average time from first commit to merging a Pull Request.\n
             Development: Average time from first commit to Pull Request Open.\n
             Rework: Average time from first commit after Pull Request Open to last commit.\n
             Review: Average time from Pull Request Open to Pull Request Close.`}
