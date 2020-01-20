@@ -20,6 +20,7 @@ const getPullRequestList = async (req: Request, res: Response): Promise<PullRequ
   const user = await UserStore.getUserByUsername(username);
   const organization = await OrganizationStore.getOrganizationByUser(user);
   const organizationKey = organization.key;
+  
 
   const repositories = await RepositoryStore.getRepositoriesInOrgByKey(organizationKey);
   const pullRequestList: PullRequest[] = [];
