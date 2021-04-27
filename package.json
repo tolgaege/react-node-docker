@@ -49,7 +49,7 @@
     "octonode": "0.9.5",
     "parse-link-header": "1.0.1",
     "pg": "7.12.1",
-    "redis": "2.8.0",
+    "redis": "3.1.1",
     "reflect-metadata": "0.1.13",
     "request-promise": "4.2.5",
     "typeorm": "0.2.20",
