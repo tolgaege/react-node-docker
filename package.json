@@ -21,7 +21,7 @@
     "@octokit/app": "4.1.0",
     "@octokit/webhooks": "6.3.2",
     "@types/cron": "^1.7.1",
-    "async": "^3.1.0",
+    "async": "^3.2.2",
     "async-redis": "1.1.7",
     "bcrypt-nodejs": "^0.0.3",
     "bluebird": "^3.5.5",
